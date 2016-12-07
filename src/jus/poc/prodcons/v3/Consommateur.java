@@ -6,8 +6,8 @@ import jus.poc.prodcons.*;
 
 public class Consommateur extends Acteur implements _Consommateur
 {
+	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
 	private final Tampon tampon;
-	private final Aleatoire aleatoire;
 	private int nombreMessages = 0;
 
 	public Consommateur(Observateur observateur, Tampon tampon) throws ControlException
@@ -15,7 +15,6 @@ public class Consommateur extends Acteur implements _Consommateur
 		super(Acteur.typeConsommateur, observateur, DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
 
 		this.tampon = tampon;
-		aleatoire = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
 
 		observateur.newConsommateur(this);
 	}
@@ -25,7 +24,7 @@ public class Consommateur extends Acteur implements _Consommateur
 	{
 		while(Producteur.producteursRestants() > 0)
 		{
-			int sleep = aleatoire.next();
+			int sleep = ALEATOIRE.next();
 
 			try
 			{

@@ -9,9 +9,9 @@ import jus.poc.prodcons.v1.MessageX;
 
 public class Producteur extends Acteur implements _Producteur
 {
+	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 	private static final AtomicInteger i = new AtomicInteger();
 	private final Tampon tampon;
-	private final Aleatoire aleatoire;
 	private int nombreMessages = Aleatoire.valeur(DEFAULT_CONFIG.getProdMessagesMean(), DEFAULT_CONFIG.getProdMessagesDev());
 
 	public Producteur(Observateur observateur, Tampon tampon) throws ControlException
@@ -19,7 +19,6 @@ public class Producteur extends Acteur implements _Producteur
 		super(Acteur.typeProducteur, observateur, DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 
 		this.tampon = tampon;
-		aleatoire = new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 
 		observateur.newProducteur(this);
 	}
@@ -36,9 +35,9 @@ public class Producteur extends Acteur implements _Producteur
 
 		int m = 0;
 
-		while(nombreDeMessages() > 0)
+		while(nombreMessages > 0)
 		{
-			int sleep = aleatoire.next();
+			int sleep = ALEATOIRE.next();
 
 			try
 			{

@@ -26,13 +26,7 @@ public class ProdCons implements Tampon
 		notFull.acquire();
 		mutexIn.acquire();
 
-		buffer[nextWrite] = message;
-		messages++;
-		nextWrite = suivant(nextWrite);
-
-		observateur.depotMessage(producteur, message);
-
-		print();
+		putMessage(producteur, message);
 
 		mutexIn.release();
 		notEmpty.release();
@@ -44,14 +38,7 @@ public class ProdCons implements Tampon
 		notEmpty.acquire();
 		mutexOut.acquire();
 
-		Message message = buffer[nextRead];
-		buffer[nextRead] = null;
-		messages--;
-		nextRead = suivant(nextRead);
-
-		observateur.retraitMessage(consommateur, message);
-
-		print();
+		Message message = getMessage(consommateur);
 
 		mutexOut.release();
 		notFull.release();
@@ -74,6 +61,31 @@ public class ProdCons implements Tampon
 	private int suivant(int n)
 	{
 		return (n + 1) % bufferSize;
+	}
+
+	private Message getMessage(_Consommateur consommateur) throws Exception
+	{
+		Message message = buffer[nextRead];
+		buffer[nextRead] = null;
+		messages--;
+		nextRead = suivant(nextRead);
+
+		observateur.retraitMessage(consommateur, message);
+
+		print();
+
+		return message;
+	}
+
+	private void putMessage(_Producteur producteur, Message message) throws Exception
+	{
+		buffer[nextWrite] = message;
+		messages++;
+		nextWrite = suivant(nextWrite);
+
+		observateur.depotMessage(producteur, message);
+
+		print();
 	}
 
 	private void print()

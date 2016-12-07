@@ -26,7 +26,7 @@ public class ProdCons implements Tampon
 		notFull.acquire();
 		mutexIn.acquire();
 
-		put(message);
+		putMessage(message);
 
 		mutexIn.release();
 		notEmpty.release();
@@ -38,7 +38,7 @@ public class ProdCons implements Tampon
 		notEmpty.acquire();
 		mutexOut.acquire();
 
-		Message message = get();
+		Message message = getMessage();
 
 		mutexOut.release();
 		notFull.release();
@@ -63,7 +63,7 @@ public class ProdCons implements Tampon
 		return (n + 1) % bufferSize;
 	}
 
-	private Message get()
+	private Message getMessage()
 	{
 		Message message = buffer[nextRead];
 		buffer[nextRead] = null;
@@ -75,7 +75,7 @@ public class ProdCons implements Tampon
 		return message;
 	}
 
-	private void put(Message message)
+	private void putMessage(Message message)
 	{
 		buffer[nextWrite] = message;
 		messages++;
