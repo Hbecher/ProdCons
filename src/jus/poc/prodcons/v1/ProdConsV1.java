@@ -16,7 +16,7 @@ public class ProdConsV1 extends ProdCons
 	@Override
 	public synchronized void put(_Producteur producteur, Message message) throws Exception
 	{
-		while(enAttente() == taille())
+		while(messages == bufferSize)
 		{
 			wait();
 		}
@@ -29,7 +29,7 @@ public class ProdConsV1 extends ProdCons
 	@Override
 	public synchronized Message get(_Consommateur consommateur) throws Exception
 	{
-		while(enAttente() == 0 && producers() > 0)
+		while(messages == 0 && producers > 0)
 		{
 			wait();
 		}
@@ -39,6 +39,17 @@ public class ProdConsV1 extends ProdCons
 			return getMessage(consommateur);
 		}
 		finally
+		{
+			notifyAll();
+		}
+	}
+
+	@Override
+	public synchronized void decProducers()
+	{
+		super.decProducers();
+
+		if(producers <= 0)
 		{
 			notifyAll();
 		}

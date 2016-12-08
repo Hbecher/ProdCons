@@ -1,16 +1,16 @@
 package jus.poc.prodcons.common;
 
-import static jus.poc.prodcons.common.MessageX.END_MESSAGE;
+import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 
 import jus.poc.prodcons.*;
 
 public abstract class ProdCons implements Tampon
 {
 	protected final Observateur observateur;
-	private final int bufferSize;
-	private final Message[] buffer;
-	private int producers, consumers;
-	private int messages = 0, nextRead = 0, nextWrite = 0;
+	protected final int bufferSize;
+	protected final Message[] buffer;
+	protected int producers, consumers;
+	protected int messages = 0, nextRead = 0, nextWrite = 0;
 
 	public ProdCons(Observateur observateur, int producers, int consumers, int bufferSize)
 	{
@@ -49,18 +49,25 @@ public abstract class ProdCons implements Tampon
 		return producers;
 	}
 
+	public void decConsumers()
+	{
+		consumers--;
+	}
+
+	public void decProducers()
+	{
+		producers--;
+	}
+
 	public void print()
 	{
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("[\t");
+		sb.append("[ ");
 
 		for(int i = 0; i < bufferSize; i++)
 		{
-			Message message = buffer[i];
-
-			sb.append(i == nextRead ? "R" : "-").append(i == nextWrite ? "W" : "-").append(message == null ? "-" : "M").append("\t");
-
+			sb.append(i == nextRead ? "R" : "-").append(i == nextWrite ? "W" : "-").append(buffer[i] == null ? "-" : "M").append(" ");
 		}
 
 		sb.append("]");
@@ -68,7 +75,7 @@ public abstract class ProdCons implements Tampon
 		System.out.println(sb);
 	}
 
-	private int suivant(int n)
+	private int next(int n)
 	{
 		return (n + 1) % bufferSize;
 	}
@@ -77,7 +84,7 @@ public abstract class ProdCons implements Tampon
 	{
 		if(producers == 0 && messages == 0)
 		{
-			return END_MESSAGE;
+			return MESSAGE_END;
 		}
 
 		Message message = buffer[nextRead];
@@ -94,24 +101,19 @@ public abstract class ProdCons implements Tampon
 
 		deposit(producteur, message);
 		nextWrite();
-
-		if(producteur.nombreDeMessages() <= 1)
-		{
-			producers--;
-		}
 	}
 
 	protected final void nextRead()
 	{
 		buffer[nextRead] = null;
 		messages--;
-		nextRead = suivant(nextRead);
+		nextRead = next(nextRead);
 	}
 
 	protected final void nextWrite()
 	{
 		messages++;
-		nextWrite = suivant(nextWrite);
+		nextWrite = next(nextWrite);
 	}
 
 	protected void deposit(_Producteur producteur, Message message) throws ControlException

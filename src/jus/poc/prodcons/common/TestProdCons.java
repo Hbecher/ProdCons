@@ -5,11 +5,12 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 import jus.poc.prodcons.ControlException;
 import jus.poc.prodcons.Observateur;
 import jus.poc.prodcons.Simulateur;
+import jus.poc.prodcons.Tampon;
 
 public abstract class TestProdCons extends Simulateur
 {
-	private final Producteur[] producers = new Producteur[DEFAULT_CONFIG.getProducers()];
-	private final Consommateur[] consumers = new Consommateur[DEFAULT_CONFIG.getConsumers()];
+	protected static final int PRODUCERS = DEFAULT_CONFIG.getProducers(), CONSUMERS = DEFAULT_CONFIG.getConsumers(), BUFFER_SIZE = DEFAULT_CONFIG.getBufferSize();
+	protected final Tampon buffer = newBuffer();
 
 	public TestProdCons(Observateur observateur)
 	{
@@ -21,30 +22,18 @@ public abstract class TestProdCons extends Simulateur
 	{
 		init();
 
-		for(int i = 0; i < producers.length; i++)
+		for(int i = 0; i < PRODUCERS; i++)
 		{
-			Producteur producteur = newProducer();
-			producers[i] = producteur;
-			producteur.start();
+			newProducer().start();
 		}
 
-		for(int i = 0; i < consumers.length; i++)
+		for(int i = 0; i < CONSUMERS; i++)
 		{
-			Consommateur consommateur = newConsumer();
-			consumers[i] = consommateur;
-			consommateur.start();
+			newConsumer().start();
 		}
 	}
 
-	protected final int producers()
-	{
-		return producers.length;
-	}
-
-	protected final int consumers()
-	{
-		return consumers.length;
-	}
+	protected abstract Tampon newBuffer();
 
 	protected abstract Producteur newProducer() throws ControlException;
 

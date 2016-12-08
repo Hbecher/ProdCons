@@ -1,15 +1,16 @@
 package jus.poc.prodcons.common;
 
-import static jus.poc.prodcons.common.MessageX.END_MESSAGE;
+import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
+import jus.poc.prodcons.message.MessageEnd;
 
 public class Consommateur extends Acteur implements _Consommateur
 {
-	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
+	protected static final Aleatoire ALEATOIRE = DEFAULT_CONFIG.areTimesInMilliseconds() ? new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev()) : new Aleatoire(DEFAULT_CONFIG.getConsTimeMean() * 1000, DEFAULT_CONFIG.getConsTimeDev() * 1000);
 	private final ProdCons tampon;
-	private int nombreMessages = 0;
+	protected int nombreMessages = 0;
 
 	public Consommateur(Observateur observateur, ProdCons tampon) throws ControlException
 	{
@@ -35,8 +36,8 @@ public class Consommateur extends Acteur implements _Consommateur
 				int time = ALEATOIRE.next();
 
 				sleep(time);
-				process(message);
 				consumption(message, time);
+				process(message);
 				next();
 			}
 			catch(Exception e)
@@ -78,7 +79,8 @@ public class Consommateur extends Acteur implements _Consommateur
 
 	protected boolean shouldEnd(Message message)
 	{
-		return message == END_MESSAGE;
+		// (message == MessageEnd.MESSAGE_END) == (message instanceof MessageEnd)
+		return message == MESSAGE_END || message instanceof MessageEnd;
 	}
 
 	protected void next()
@@ -89,6 +91,8 @@ public class Consommateur extends Acteur implements _Consommateur
 	protected void end()
 	{
 		System.out.println("Consommateur n°" + identification() + " terminé");
+
+		tampon.decConsumers();
 	}
 
 	protected void consumption(Message message, int time) throws ControlException

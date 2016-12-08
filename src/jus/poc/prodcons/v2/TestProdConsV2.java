@@ -1,22 +1,17 @@
 package jus.poc.prodcons.v2;
 
-import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
-
 import jus.poc.prodcons.ControlException;
 import jus.poc.prodcons.Observateur;
+import jus.poc.prodcons.Tampon;
 import jus.poc.prodcons.common.Consommateur;
 import jus.poc.prodcons.common.Producteur;
-import jus.poc.prodcons.common.TestProdCons;
+import jus.poc.prodcons.v1.TestProdConsV1;
 
-public class TestProdConsV2 extends TestProdCons
+public class TestProdConsV2 extends TestProdConsV1
 {
-	private final ProdConsV2 tampon;
-
 	public TestProdConsV2(Observateur observateur)
 	{
 		super(observateur);
-
-		tampon = new ProdConsV2(observateur, producers(), consumers(), DEFAULT_CONFIG.getBufferSize());
 	}
 
 	public static void main(String[] args)
@@ -25,14 +20,20 @@ public class TestProdConsV2 extends TestProdCons
 	}
 
 	@Override
+	protected Tampon newBuffer()
+	{
+		return new ProdConsV2(observateur, PRODUCERS, CONSUMERS, BUFFER_SIZE);
+	}
+
+	@Override
 	protected Producteur newProducer() throws ControlException
 	{
-		return new ProducteurV2(observateur, tampon);
+		return new ProducteurV2(observateur, (ProdConsV2) buffer);
 	}
 
 	@Override
 	protected Consommateur newConsumer() throws ControlException
 	{
-		return new ConsommateurV2(observateur, tampon);
+		return new ConsommateurV2(observateur, (ProdConsV2) buffer);
 	}
 }

@@ -3,12 +3,13 @@ package jus.poc.prodcons.common;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
+import jus.poc.prodcons.message.MessageX;
 
 public class Producteur extends Acteur implements _Producteur
 {
-	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
+	protected static final Aleatoire ALEATOIRE = DEFAULT_CONFIG.areTimesInMilliseconds() ? new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev()) : new Aleatoire(DEFAULT_CONFIG.getProdTimeMean() * 1000, DEFAULT_CONFIG.getProdTimeDev() * 1000);
 	private final ProdCons tampon;
-	private int nombreMessages = Aleatoire.valeur(DEFAULT_CONFIG.getProdMessagesMean(), DEFAULT_CONFIG.getProdMessagesDev());
+	protected int nombreMessages = Aleatoire.valeur(DEFAULT_CONFIG.getProdMessagesMean(), DEFAULT_CONFIG.getProdMessagesDev());
 
 	public Producteur(Observateur observateur, ProdCons tampon) throws ControlException
 	{
@@ -32,9 +33,9 @@ public class Producteur extends Acteur implements _Producteur
 
 				Message message = newMessage(id);
 
-				put(message);
-				process(message);
 				production(message, time);
+				process(message);
+				put(message);
 				next();
 
 				id++;
@@ -71,9 +72,9 @@ public class Producteur extends Acteur implements _Producteur
 		}
 	}
 
-	protected Message newMessage(int number)
+	protected Message newMessage(int id)
 	{
-		return new MessageX(this, number);
+		return new MessageX(this, id);
 	}
 
 	protected void put(Message message) throws Exception
@@ -94,6 +95,8 @@ public class Producteur extends Acteur implements _Producteur
 	protected void end()
 	{
 		System.out.println("Producteur n°" + identification() + " terminé");
+
+		tampon.decProducers();
 	}
 
 	protected void production(Message message, int time) throws ControlException

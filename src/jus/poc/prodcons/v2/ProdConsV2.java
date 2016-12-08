@@ -4,11 +4,12 @@ import jus.poc.prodcons.Message;
 import jus.poc.prodcons.Observateur;
 import jus.poc.prodcons._Consommateur;
 import jus.poc.prodcons._Producteur;
-import jus.poc.prodcons.common.ProdCons;
+import jus.poc.prodcons.common.Semaphore;
+import jus.poc.prodcons.v1.ProdConsV1;
 
-public class ProdConsV2 extends ProdCons
+public class ProdConsV2 extends ProdConsV1
 {
-	private final Semaphore mutexIn = new Semaphore(1), mutexOut = new Semaphore(1), notEmpty = new Semaphore(0), notFull;
+	protected final Semaphore mutexIn = new Semaphore(1), mutexOut = new Semaphore(1), notEmpty = new Semaphore(0), notFull;
 
 	public ProdConsV2(Observateur observateur, int producers, int consumers, int bufferSize)
 	{
@@ -41,13 +42,24 @@ public class ProdConsV2 extends ProdCons
 		}
 		finally
 		{
-			if(producers() == 0)
+			if(producers == 0)
 			{
 				notEmpty.V();
 			}
 
 			mutexOut.V();
 			notFull.V();
+		}
+	}
+
+	@Override
+	public synchronized void decProducers()
+	{
+		producers--;
+
+		if(producers == 0)
+		{
+			notEmpty.V();
 		}
 	}
 }
