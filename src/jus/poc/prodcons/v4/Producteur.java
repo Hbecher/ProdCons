@@ -5,7 +5,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jus.poc.prodcons.*;
-import jus.poc.prodcons.v1.MessageX;
+import jus.poc.prodcons.common.MessageX;
 
 public class Producteur extends Acteur implements _Producteur
 {
@@ -38,15 +38,24 @@ public class Producteur extends Acteur implements _Producteur
 		while(nombreMessages > 0)
 		{
 			Message message = new MessageX(this, ++m);
-			int rand = MSG_ALEATOIRE.next(), i = rand;
+			int msgs = MSG_ALEATOIRE.next();
 
-			while(i > 0)
+			while(msgs > 0)
 			{
 				int sleep = ALEATOIRE.next();
 
 				try
 				{
 					tampon.put(this, message);
+
+					try
+					{
+						Thread.sleep(sleep);
+					}
+					catch(InterruptedException e)
+					{
+						e.printStackTrace();
+					}
 
 					observateur.productionMessage(this, message, sleep);
 
@@ -57,22 +66,15 @@ public class Producteur extends Acteur implements _Producteur
 					e.printStackTrace();
 				}
 
-				try
-				{
-					Thread.sleep(sleep);
-				}
-				catch(InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-
-				i--;
+				msgs--;
 			}
 
 			nombreMessages--;
 		}
 
 		i.addAndGet(-1);
+
+		System.out.println(getName() + " terminé");
 	}
 
 	@Override

@@ -9,6 +9,10 @@ public class Config
 	{
 		private boolean isInitialized = false;
 
+		{
+			init();
+		}
+
 		@Override
 		public void init()
 		{
@@ -22,11 +26,6 @@ public class Config
 			isInitialized = true;
 		}
 	};
-
-	static
-	{
-		DEFAULT_CONFIG.init();
-	}
 
 	private final String configFile;
 	private final Properties config = new Properties();
@@ -50,68 +49,87 @@ public class Config
 		}
 	}
 
-	public int getConsumers()
+	private int getInt(String key, int def)
 	{
-		return Integer.parseInt(config.getProperty("nbProd"));
+		String value = config.getProperty(key);
+
+		return value == null ? def : Integer.parseInt(value);
+	}
+
+	private boolean getBoolean(String key, boolean def)
+	{
+		String value = config.getProperty(key);
+
+		return value == null ? def : Boolean.parseBoolean(value);
 	}
 
 	public int getProducers()
 	{
-		return Integer.parseInt(config.getProperty("nbCons"));
+		return getInt("nbProd", 1);
+	}
+
+	public int getConsumers()
+	{
+		return getInt("nbCons", 10);
 	}
 
 	public int getBufferSize()
 	{
-		return Integer.parseInt(config.getProperty("nbBuffer"));
+		return getInt("nbBuffer", 1);
 	}
 
 	public int getProdTimeMean()
 	{
-		return Integer.parseInt(config.getProperty("tempsMoyenProduction"));
+		return getInt("tempsMoyenProduction", 10);
 	}
 
 	public int getProdTimeDev()
 	{
-		return Integer.parseInt(config.getProperty("deviationTempsMoyenProduction"));
+		return getInt("deviationTempsMoyenProduction", 1);
 	}
 
 	public int getConsTimeMean()
 	{
-		return Integer.parseInt(config.getProperty("tempsMoyenConsommation"));
+		return getInt("tempsMoyenConsommation", 10);
 	}
 
 	public int getConsTimeDev()
 	{
-		return Integer.parseInt(config.getProperty("deviationTempsMoyenConsommation"));
+		return getInt("deviationTempsMoyenConsommation", 1);
 	}
 
 	public int getProdMessagesMean()
 	{
-		return Integer.parseInt(config.getProperty("nombreMoyenDeProduction"));
+		return getInt("nombreMoyenDeProduction", 5);
 	}
 
 	public int getProdMessagesDev()
 	{
-		return Integer.parseInt(config.getProperty("deviationNombreMoyenDeProduction"));
+		return getInt("deviationNombreMoyenDeProduction", 1);
 	}
 
 	public int getConsMessagesMean()
 	{
-		return Integer.parseInt(config.getProperty("nombreMoyenNbExemplaire"));
+		return getInt("nombreMoyenNbExemplaire", 5);
 	}
 
 	public int getConsMessagesDev()
 	{
-		return Integer.parseInt(config.getProperty("deviationNombreMoyenNbExemplaire"));
+		return getInt("deviationNombreMoyenNbExemplaire", 3);
+	}
+
+	public boolean areTimesInMilliseconds()
+	{
+		return getBoolean("tempsEnMs", false);
 	}
 
 	public boolean isPrintingEnabled()
 	{
-		return Boolean.parseBoolean(config.getProperty("impressions"));
+		return getBoolean("impressions", true);
 	}
 
 	public boolean isLoggingEnabled()
 	{
-		return Boolean.parseBoolean(config.getProperty("journaux"));
+		return getBoolean("journaux", false);
 	}
 }

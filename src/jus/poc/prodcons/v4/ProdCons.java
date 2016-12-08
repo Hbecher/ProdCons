@@ -1,5 +1,7 @@
 package jus.poc.prodcons.v4;
 
+import static jus.poc.prodcons.common.MessageX.END_MESSAGE;
+
 import java.util.concurrent.Semaphore;
 
 import jus.poc.prodcons.*;
@@ -38,12 +40,22 @@ public class ProdCons implements Tampon
 		notEmpty.acquire();
 		mutexOut.acquire();
 
-		Message message = getMessage(consommateur);
+		try
+		{
+			if(Producteur.producteursRestants() == 0)
+			{
+				notEmpty.release();
 
-		mutexOut.release();
-		notFull.release();
+				return END_MESSAGE;
+			}
 
-		return message;
+			return getMessage(consommateur);
+		}
+		finally
+		{
+			mutexOut.release();
+			notFull.release();
+		}
 	}
 
 	@Override
