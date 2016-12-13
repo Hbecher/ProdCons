@@ -52,14 +52,9 @@ public class MessageTTL extends MessageX
 		return c <= 0;
 	}
 
-	public void P() throws InterruptedException
+	public void wakeup()
 	{
-		s.acquire();
-	}
-
-	public void V()
-	{
-		s.release();
+		getSender().wakeup();
 	}
 
 	@Override

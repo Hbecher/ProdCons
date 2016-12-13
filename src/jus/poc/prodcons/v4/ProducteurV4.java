@@ -3,6 +3,7 @@ package jus.poc.prodcons.v4;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
+import jus.poc.prodcons.common.Semaphore;
 import jus.poc.prodcons.message.MessageTTL;
 
 public class ProducteurV4 extends Acteur implements _Producteur
@@ -10,6 +11,7 @@ public class ProducteurV4 extends Acteur implements _Producteur
 	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 	private final ProdConsV4 tampon;
 	private int nombreMessages = Aleatoire.valeur(DEFAULT_CONFIG.getProdMessagesMean(), DEFAULT_CONFIG.getProdMessagesDev());
+	private final Semaphore wait = new Semaphore(0);
 
 	public ProducteurV4(Observateur observateur, ProdConsV4 tampon) throws ControlException
 	{
@@ -40,7 +42,7 @@ public class ProducteurV4 extends Acteur implements _Producteur
 
 				System.out.println(identification() + " -> " + message);
 
-				message.P();
+				wait.acquire();
 
 				nombreMessages--;
 				id++;
@@ -60,5 +62,10 @@ public class ProducteurV4 extends Acteur implements _Producteur
 	public int nombreDeMessages()
 	{
 		return nombreMessages;
+	}
+
+	public void wakeup()
+	{
+		wait.release();
 	}
 }

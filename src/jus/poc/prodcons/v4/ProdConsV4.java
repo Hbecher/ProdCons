@@ -48,7 +48,7 @@ public class ProdConsV4 implements Tampon
 		notEmpty.acquire();
 		mutexOut.acquire();
 
-		boolean wakeup = false;
+		boolean wakeupC = false, wakeupP = false;
 		Message message;
 
 		if(producers == 0 && messages == 0)
@@ -69,11 +69,13 @@ public class ProdConsV4 implements Tampon
 				messages--;
 				nextRead = next(nextRead);
 
-				ttl.V();
+				ttl.wakeup();
+
+				wakeupP = true;
 			}
 			else
 			{
-				wakeup = true;
+				wakeupC = true;
 			}
 
 			message = ttl;
@@ -81,12 +83,15 @@ public class ProdConsV4 implements Tampon
 
 		mutexOut.release();
 
-		if(producers == 0 || wakeup)
+		if(producers == 0 || wakeupC)
 		{
 			notEmpty.release();
 		}
 
-		notFull.release();
+		if(wakeupP)
+		{
+			notFull.release();
+		}
 
 		return message;
 	}
