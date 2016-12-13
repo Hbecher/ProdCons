@@ -1,4 +1,4 @@
-package jus.poc.prodcons.v4;
+package jus.poc.prodcons.v5;
 
 import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
@@ -6,13 +6,13 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageEnd;
 
-public class ConsommateurV4 extends Acteur implements _Consommateur
+public class ConsommateurV5 extends Acteur implements _Consommateur
 {
 	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
-	private final ProdConsV4 tampon;
+	private final ProdConsV5 tampon;
 	private int nombreMessages = 0;
 
-	public ConsommateurV4(Observateur observateur, ProdConsV4 tampon) throws ControlException
+	public ConsommateurV5(Observateur observateur, ProdConsV5 tampon) throws ControlException
 	{
 		super(Acteur.typeConsommateur, observateur, DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
 

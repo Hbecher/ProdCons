@@ -5,53 +5,121 @@ import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.common.Semaphore;
 import jus.poc.prodcons.message.MessageTTL;
-import jus.poc.prodcons.v3.ProdConsV3;
 
-public class ProdConsV4 extends ProdConsV3
+public class ProdConsV4 implements Tampon
 {
-	private final Semaphore waitC = new Semaphore(0), waitP = new Semaphore(0);
+	private final Observateur observateur;
+	private final int bufferSize;
+	private final Message[] buffer;
+	private int producers, consumers;
+	private int messages = 0, nextRead = 0, nextWrite = 0;
+	private final Semaphore mutexIn = new Semaphore(1), mutexOut = new Semaphore(1), notEmpty = new Semaphore(0), notFull;
+
 	public ProdConsV4(Observateur observateur, int producers, int consumers, int bufferSize)
 	{
-		super(observateur, producers, consumers, bufferSize);
+		this.observateur = observateur;
+		this.bufferSize = bufferSize;
+		this.producers = producers;
+		this.consumers = consumers;
+		buffer = new Message[bufferSize];
+		notFull = new Semaphore(bufferSize);
 	}
 
 	@Override
-	protected Message getMessage(_Consommateur consommateur) throws ControlException
+	public void put(_Producteur producteur, Message message) throws Exception
 	{
+		notFull.acquire();
+		mutexIn.acquire();
+
+		buffer[nextWrite] = message;
+
+		observateur.depotMessage(producteur, message);
+
+		messages++;
+		nextWrite = next(nextWrite);
+
+		mutexIn.release();
+		notEmpty.release();
+	}
+
+	@Override
+	public Message get(_Consommateur consommateur) throws Exception
+	{
+		notEmpty.acquire();
+		mutexOut.acquire();
+
+		boolean wakeup = false;
+		Message message;
+
 		if(producers == 0 && messages == 0)
 		{
-			return MESSAGE_END;
-		}
-
-		MessageTTL message = (MessageTTL) buffer[nextRead];
-
-		retrieve(consommateur, message);
-
-		message.decTTL();
-
-		if(message.getTTL() <= 0)
-		{
-			message.getSender();
-
-			nextRead();
-
-
+			message = MESSAGE_END;
 		}
 		else
 		{
-			notEmpty.V();
+			MessageTTL ttl = (MessageTTL) buffer[nextRead];
+
+			observateur.retraitMessage(consommateur, ttl);
+
+			ttl.dec();
+
+			if(ttl.isLast())
+			{
+				buffer[nextRead] = null;
+				messages--;
+				nextRead = next(nextRead);
+
+				ttl.V();
+			}
+			else
+			{
+				wakeup = true;
+			}
+
+			message = ttl;
 		}
 
-		print();
+		mutexOut.release();
+
+		if(producers == 0 || wakeup)
+		{
+			notEmpty.release();
+		}
+
+		notFull.release();
 
 		return message;
 	}
 
 	@Override
-	protected void putMessage(_Producteur producteur, Message message) throws ControlException
+	public int enAttente()
 	{
-		super.putMessage(producteur, message);
+		return messages;
+	}
 
-		print();
+	@Override
+	public int taille()
+	{
+		return bufferSize;
+	}
+
+	public synchronized void decConsumers()
+	{
+		consumers--;
+	}
+
+	public synchronized void decProducers()
+	{
+		producers--;
+
+		if(producers == 0)
+		{
+			notEmpty.release();
+		}
+	}
+
+	private int next(int n)
+	{
+		return (n + 1) % bufferSize;
 	}
 }

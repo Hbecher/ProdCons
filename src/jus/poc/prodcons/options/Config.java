@@ -118,18 +118,8 @@ public class Config
 		return getInt("deviationNombreMoyenNbExemplaire", 3);
 	}
 
-	public boolean areTimesInMilliseconds()
-	{
-		return getBoolean("tempsEnMs", false);
-	}
-
 	public boolean isPrintingEnabled()
 	{
 		return getBoolean("impressions", true);
-	}
-
-	public boolean isLoggingEnabled()
-	{
-		return getBoolean("journaux", false);
 	}
 }

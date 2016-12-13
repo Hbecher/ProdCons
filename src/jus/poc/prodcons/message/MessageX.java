@@ -5,9 +5,9 @@ import jus.poc.prodcons._Producteur;
 
 public class MessageX implements Message
 {
-	private final _Producteur producteur;
-	private final int id;
-	private final String message;
+	protected final _Producteur producteur;
+	protected final int id;
+	protected final String message;
 
 	public MessageX(_Producteur producteur, int id)
 	{

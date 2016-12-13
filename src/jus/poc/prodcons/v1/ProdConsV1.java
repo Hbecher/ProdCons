@@ -1,16 +1,25 @@
 package jus.poc.prodcons.v1;
 
+import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
+
 import jus.poc.prodcons.Message;
-import jus.poc.prodcons.Observateur;
+import jus.poc.prodcons.Tampon;
 import jus.poc.prodcons._Consommateur;
 import jus.poc.prodcons._Producteur;
-import jus.poc.prodcons.common.ProdCons;
 
-public class ProdConsV1 extends ProdCons
+public class ProdConsV1 implements Tampon
 {
-	public ProdConsV1(Observateur observateur, int producers, int consumers, int bufferSize)
+	private final int bufferSize;
+	private final Message[] buffer;
+	private int producers, consumers;
+	private int messages = 0, nextRead = 0, nextWrite = 0;
+
+	public ProdConsV1(int producers, int consumers, int bufferSize)
 	{
-		super(observateur, producers, consumers, bufferSize);
+		this.bufferSize = bufferSize;
+		this.producers = producers;
+		this.consumers = consumers;
+		buffer = new Message[bufferSize];
 	}
 
 	@Override
@@ -21,7 +30,9 @@ public class ProdConsV1 extends ProdCons
 			wait();
 		}
 
-		putMessage(producteur, message);
+		buffer[nextWrite] = message;
+		messages++;
+		nextWrite = next(nextWrite);
 
 		notifyAll();
 	}
@@ -36,7 +47,18 @@ public class ProdConsV1 extends ProdCons
 
 		try
 		{
-			return getMessage(consommateur);
+			if(producers == 0 && messages == 0)
+			{
+				return MESSAGE_END;
+			}
+
+			Message message = buffer[nextRead];
+
+			buffer[nextRead] = null;
+			messages--;
+			nextRead = next(nextRead);
+
+			return message;
 		}
 		finally
 		{
@@ -44,14 +66,47 @@ public class ProdConsV1 extends ProdCons
 		}
 	}
 
+
 	@Override
+	public int enAttente()
+	{
+		return messages;
+	}
+
+	@Override
+	public int taille()
+	{
+		return bufferSize;
+	}
+
+	public synchronized void decConsumers()
+	{
+		consumers--;
+	}
+
 	public synchronized void decProducers()
 	{
-		super.decProducers();
+		producers--;
+	}
 
-		if(producers <= 0)
+	public void print()
+	{
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(Thread.currentThread().getName()).append("\t[ ");
+
+		for(int i = 0; i < bufferSize; i++)
 		{
-			notifyAll();
+			sb.append(i == nextRead ? "R" : "-").append(i == nextWrite ? "W" : "-").append(buffer[i] == null ? "-" : "M").append(" ");
 		}
+
+		sb.append("]");
+
+		System.err.println(sb);
+	}
+
+	private int next(int n)
+	{
+		return (n + 1) % bufferSize;
 	}
 }

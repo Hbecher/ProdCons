@@ -3,12 +3,15 @@ package jus.poc.prodcons.message;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.Aleatoire;
+import jus.poc.prodcons.common.Semaphore;
 import jus.poc.prodcons.v4.ProducteurV4;
 
 public class MessageTTL extends MessageX
 {
-	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
-	private int ttl;
+	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsMessagesMean(), DEFAULT_CONFIG.getConsMessagesDev());
+	private final Semaphore s = new Semaphore(0);
+	private final int ttl;
+	private int c;
 
 	public MessageTTL(ProducteurV4 producteur, int id)
 	{
@@ -20,6 +23,7 @@ public class MessageTTL extends MessageX
 		super(producteur, id, message);
 
 		ttl = ALEATOIRE.next();
+		c = ttl;
 	}
 
 	@Override
@@ -28,24 +32,39 @@ public class MessageTTL extends MessageX
 		return (ProducteurV4) super.getSender();
 	}
 
-	public int getTTL()
+	public int getInitTTL()
 	{
 		return ttl;
 	}
 
-	public void decTTL()
+	public int getTTL()
 	{
-		ttl--;
+		return c;
+	}
+
+	public void dec()
+	{
+		--c;
 	}
 
 	public boolean isLast()
 	{
-		return ttl <= 0;
+		return c <= 0;
+	}
+
+	public void P() throws InterruptedException
+	{
+		s.acquire();
+	}
+
+	public void V()
+	{
+		s.release();
 	}
 
 	@Override
 	public String toString()
 	{
-		return String.format("%d-%d-%d: %s", getSender().identification(), getID(), ttl, getMessage() == null ? "<empty>" : getMessage());
+		return String.format("%d-%d-%d: %s", producteur.identification(), id, ttl, message == null ? "<empty>" : message);
 	}
 }

@@ -1,13 +1,60 @@
 package jus.poc.prodcons.v1;
 
-import jus.poc.prodcons.ControlException;
-import jus.poc.prodcons.Observateur;
-import jus.poc.prodcons.common.Consommateur;
+import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
+import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
-public class ConsommateurV1 extends Consommateur
+import jus.poc.prodcons.*;
+import jus.poc.prodcons.message.MessageEnd;
+
+public class ConsommateurV1 extends Acteur implements _Consommateur
 {
+	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
+	private final ProdConsV1 tampon;
+	private int nombreMessages = 0;
+
 	public ConsommateurV1(Observateur observateur, ProdConsV1 tampon) throws ControlException
 	{
-		super(observateur, tampon);
+		super(Acteur.typeConsommateur, observateur, DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
+
+		this.tampon = tampon;
+	}
+
+	@Override
+	public void run()
+	{
+		while(true)
+		{
+			try
+			{
+				Message message = tampon.get(this);
+
+				if(message == MESSAGE_END || message instanceof MessageEnd)
+				{
+					break;
+				}
+
+				int time = ALEATOIRE.next();
+
+				Thread.sleep(time);
+
+				System.out.println(identification() + " <- " + message);
+
+				nombreMessages++;
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("Consommateur n°" + identification() + " terminé");
+
+		tampon.decConsumers();
+	}
+
+	@Override
+	public int nombreDeMessages()
+	{
+		return nombreMessages;
 	}
 }

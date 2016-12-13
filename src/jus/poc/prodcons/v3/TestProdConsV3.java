@@ -1,17 +1,20 @@
 package jus.poc.prodcons.v3;
 
-import jus.poc.prodcons.ControlException;
-import jus.poc.prodcons.Observateur;
-import jus.poc.prodcons.Tampon;
-import jus.poc.prodcons.common.Consommateur;
-import jus.poc.prodcons.common.Producteur;
-import jus.poc.prodcons.v2.TestProdConsV2;
+import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
-public class TestProdConsV3 extends TestProdConsV2
+import jus.poc.prodcons.Observateur;
+import jus.poc.prodcons.Simulateur;
+
+public class TestProdConsV3 extends Simulateur
 {
+	private static final int PRODUCERS = DEFAULT_CONFIG.getProducers(), CONSUMERS = DEFAULT_CONFIG.getConsumers(), BUFFER_SIZE = DEFAULT_CONFIG.getBufferSize();
+	protected final ProdConsV3 tampon;
+
 	public TestProdConsV3(Observateur observateur)
 	{
 		super(observateur);
+
+		tampon = new ProdConsV3(observateur, PRODUCERS, CONSUMERS, BUFFER_SIZE);
 	}
 
 	public static void main(String[] args)
@@ -20,26 +23,18 @@ public class TestProdConsV3 extends TestProdConsV2
 	}
 
 	@Override
-	protected Tampon newBuffer()
+	protected final void run() throws Exception
 	{
-		return new ProdConsV3(observateur, PRODUCERS, CONSUMERS, BUFFER_SIZE);
-	}
+		observateur.init(PRODUCERS, CONSUMERS, BUFFER_SIZE);
 
-	@Override
-	protected Producteur newProducer() throws ControlException
-	{
-		return new ProducteurV3(observateur, (ProdConsV3) buffer);
-	}
+		for(int i = 0; i < PRODUCERS; i++)
+		{
+			new ProducteurV3(observateur, tampon).start();
+		}
 
-	@Override
-	protected Consommateur newConsumer() throws ControlException
-	{
-		return new ConsommateurV3(observateur, (ProdConsV3) buffer);
-	}
-
-	@Override
-	protected void init() throws ControlException
-	{
-		observateur.init(PRODUCERS, CONSUMERS, buffer.taille());
+		for(int i = 0; i < CONSUMERS; i++)
+		{
+			new ConsommateurV3(observateur, tampon).start();
+		}
 	}
 }

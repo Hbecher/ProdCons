@@ -1,22 +1,64 @@
 package jus.poc.prodcons.v3;
 
-import jus.poc.prodcons.ControlException;
-import jus.poc.prodcons.Message;
-import jus.poc.prodcons.Observateur;
-import jus.poc.prodcons.v2.ConsommateurV2;
+import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
+import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
-public class ConsommateurV3 extends ConsommateurV2
+import jus.poc.prodcons.*;
+import jus.poc.prodcons.message.MessageEnd;
+
+public class ConsommateurV3 extends Acteur implements _Consommateur
 {
+	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
+	private final ProdConsV3 tampon;
+	private int nombreMessages = 0;
+
 	public ConsommateurV3(Observateur observateur, ProdConsV3 tampon) throws ControlException
 	{
-		super(observateur, tampon);
+		super(Acteur.typeConsommateur, observateur, DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
+
+		this.tampon = tampon;
 
 		observateur.newConsommateur(this);
 	}
 
 	@Override
-	protected void consumption(Message message, int time) throws ControlException
+	public void run()
 	{
-		observateur.consommationMessage(this, message, time);
+		while(true)
+		{
+			try
+			{
+				Message message = tampon.get(this);
+
+				if(message == MESSAGE_END || message instanceof MessageEnd)
+				{
+					break;
+				}
+
+				int time = ALEATOIRE.next();
+
+				Thread.sleep(time);
+
+				observateur.consommationMessage(this, message, time);
+
+				System.out.println(identification() + " <- " + message);
+
+				nombreMessages++;
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("Consommateur n°" + identification() + " terminé");
+
+		tampon.decConsumers();
+	}
+
+	@Override
+	public int nombreDeMessages()
+	{
+		return nombreMessages;
 	}
 }

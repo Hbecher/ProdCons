@@ -1,17 +1,17 @@
-package jus.poc.prodcons.v3;
+package jus.poc.prodcons.v5;
 
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageX;
 
-public class ProducteurV3 extends Acteur implements _Producteur
+public class ProducteurV5 extends Acteur implements _Producteur
 {
 	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
-	private final ProdConsV3 tampon;
+	private final ProdConsV5 tampon;
 	private int nombreMessages = Aleatoire.valeur(DEFAULT_CONFIG.getProdMessagesMean(), DEFAULT_CONFIG.getProdMessagesDev());
 
-	public ProducteurV3(Observateur observateur, ProdConsV3 tampon) throws ControlException
+	public ProducteurV5(Observateur observateur, ProdConsV5 tampon) throws ControlException
 	{
 		super(Acteur.typeProducteur, observateur, DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 

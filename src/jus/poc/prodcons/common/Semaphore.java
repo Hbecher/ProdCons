@@ -7,11 +7,10 @@ public class Semaphore
 
 	public Semaphore(int permits)
 	{
-		this.permits = permits;
-		c = permits;
+		this.permits = c = permits;
 	}
 
-	public synchronized void P() throws InterruptedException
+	public synchronized void acquire() throws InterruptedException
 	{
 		c--;
 
@@ -21,7 +20,7 @@ public class Semaphore
 		}
 	}
 
-	public synchronized void V()
+	public synchronized void release()
 	{
 		c++;
 
@@ -36,7 +35,7 @@ public class Semaphore
 		return permits;
 	}
 
-	public int count()
+	public synchronized int count()
 	{
 		return c;
 	}
