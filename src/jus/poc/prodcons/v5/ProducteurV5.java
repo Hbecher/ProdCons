@@ -4,7 +4,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageX;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 
 public class ProducteurV5 extends Acteur implements _Producteur
 {
@@ -20,7 +20,7 @@ public class ProducteurV5 extends Acteur implements _Producteur
 
 		observateur.newProducteur(this);
 
-		Printer.printNewProducer(this);
+		Afficheur.printNewProducer(this);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class ProducteurV5 extends Acteur implements _Producteur
 
 				observateur.productionMessage(this, message, time);
 
-				Printer.printProduction(this, message, time);
+				Afficheur.printProduction(this, message, time);
 
 				tampon.put(this, message);
 
@@ -53,7 +53,7 @@ public class ProducteurV5 extends Acteur implements _Producteur
 			}
 		}
 
-		Printer.printEndProducer(this);
+		Afficheur.printEndProducer(this);
 
 		tampon.decProducers();
 	}

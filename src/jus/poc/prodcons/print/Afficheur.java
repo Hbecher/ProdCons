@@ -10,14 +10,14 @@ import jus.poc.prodcons._Producteur;
  * Cette classe permet d'afficher à l'écran plusieurs états du système.<br />
  * Les impressions sont désactivables via l'entrée {@code impressions} de la configuration.
  */
-public class Printer
+public class Afficheur
 {
 	private static final boolean PRINTING_ENABLED = DEFAULT_CONFIG.isPrintingEnabled();
 	private static final String LINE_SEPARATOR = System.lineSeparator();
 
 	private static void println(String line)
 	{
-		System.out.println(line + LINE_SEPARATOR);
+		System.out.println(line + LINE_SEPARATOR + "--------------------------------");
 	}
 
 	/**
@@ -158,8 +158,11 @@ public class Printer
 	{
 		if(PRINTING_ENABLED)
 		{
+			int msgs = producteur.nombreDeMessages() - 1;
+
 			String line = "Production d'un message :" + LINE_SEPARATOR +
 					"- Producteur n°" + producteur.identification() + LINE_SEPARATOR +
+					"- Reste : " + msgs + " message" + (msgs > 1 ? "s" : "") + LINE_SEPARATOR +
 					"- Temps : " + time + "ms" + LINE_SEPARATOR +
 					"- Message : " + message;
 

@@ -4,7 +4,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageTTL;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 import jus.poc.prodcons.v2.Semaphore;
 
 public class ProducteurV4 extends Acteur implements _Producteur
@@ -22,7 +22,7 @@ public class ProducteurV4 extends Acteur implements _Producteur
 
 		observateur.newProducteur(this);
 
-		Printer.printNewProducer(this);
+		Afficheur.printNewProducer(this);
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class ProducteurV4 extends Acteur implements _Producteur
 
 				observateur.productionMessage(this, message, time);
 
-				Printer.printProduction(this, message, time);
+				Afficheur.printProduction(this, message, time);
 
 				tampon.put(this, message);
 				// après avoir publié le message, on attend qu'il soit intégralement consommé
@@ -57,7 +57,7 @@ public class ProducteurV4 extends Acteur implements _Producteur
 			}
 		}
 
-		Printer.printEndProducer(this);
+		Afficheur.printEndProducer(this);
 
 		tampon.decProducers();
 	}

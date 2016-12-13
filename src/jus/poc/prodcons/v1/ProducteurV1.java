@@ -4,7 +4,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageX;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 
 public class ProducteurV1 extends Acteur implements _Producteur
 {
@@ -18,7 +18,7 @@ public class ProducteurV1 extends Acteur implements _Producteur
 
 		this.tampon = tampon;
 
-		Printer.printNewProducer(this);
+		Afficheur.printNewProducer(this);
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class ProducteurV1 extends Acteur implements _Producteur
 
 				Message message = new MessageX(this, id, Long.toString(System.currentTimeMillis()));
 
-				Printer.printProduction(this, message, time);
+				Afficheur.printProduction(this, message, time);
 
 				// on met le message dans le buffer
 				tampon.put(this, message);
@@ -52,7 +52,7 @@ public class ProducteurV1 extends Acteur implements _Producteur
 			}
 		}
 
-		Printer.printEndProducer(this);
+		Afficheur.printEndProducer(this);
 
 		// à la fin, on décrémente les producteurs restants
 		tampon.decProducers();

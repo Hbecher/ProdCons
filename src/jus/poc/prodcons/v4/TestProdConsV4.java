@@ -8,7 +8,7 @@ import jus.poc.prodcons.Simulateur;
 public class TestProdConsV4 extends Simulateur
 {
 	private static final int PRODUCERS = DEFAULT_CONFIG.getProducers(), CONSUMERS = DEFAULT_CONFIG.getConsumers(), BUFFER_SIZE = DEFAULT_CONFIG.getBufferSize();
-	protected final ProdConsV4 tampon;
+	private final ProdConsV4 tampon;
 
 	public TestProdConsV4(Observateur observateur)
 	{

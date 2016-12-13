@@ -5,7 +5,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageEnd;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 
 public class ConsommateurV3 extends Acteur implements _Consommateur
 {
@@ -21,7 +21,7 @@ public class ConsommateurV3 extends Acteur implements _Consommateur
 
 		observateur.newConsommateur(this);
 
-		Printer.printNewConsumer(this);
+		Afficheur.printNewConsumer(this);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class ConsommateurV3 extends Acteur implements _Consommateur
 
 				observateur.consommationMessage(this, message, time);
 
-				Printer.printConsumption(this, message, time);
+				Afficheur.printConsumption(this, message, time);
 
 				nombreMessages++;
 			}
@@ -54,7 +54,7 @@ public class ConsommateurV3 extends Acteur implements _Consommateur
 			}
 		}
 
-		Printer.printEndConsumer(this);
+		Afficheur.printEndConsumer(this);
 
 		tampon.decConsumers();
 	}

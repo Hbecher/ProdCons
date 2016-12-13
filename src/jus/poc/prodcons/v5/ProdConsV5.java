@@ -7,7 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import jus.poc.prodcons.*;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 
 public class ProdConsV5 implements Tampon
 {
@@ -47,7 +47,7 @@ public class ProdConsV5 implements Tampon
 			messages++;
 			nextWrite = next(nextWrite);
 
-			Printer.printPut(producteur, message);
+			Afficheur.printPut(producteur, message);
 
 			notEmpty.signal();
 		}
@@ -85,7 +85,7 @@ public class ProdConsV5 implements Tampon
 				messages--;
 				nextRead = next(nextRead);
 
-				Printer.printGet(consommateur, message);
+				Afficheur.printGet(consommateur, message);
 			}
 
 			notFull.signal();

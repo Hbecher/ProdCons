@@ -1,4 +1,4 @@
-package jus.poc.prodcons.v1;
+package jus.poc.prodcons.v6;
 
 import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
@@ -7,17 +7,19 @@ import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageEnd;
 import jus.poc.prodcons.print.Afficheur;
 
-public class ConsommateurV1 extends Acteur implements _Consommateur
+public class ConsommateurV6 extends Acteur implements _Consommateur
 {
 	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
-	private final ProdConsV1 tampon;
+	private final ProdConsV6 tampon;
 	private int nombreMessages = 0;
 
-	public ConsommateurV1(Observateur observateur, ProdConsV1 tampon) throws ControlException
+	public ConsommateurV6(Observateur observateur, ProdConsV6 tampon) throws ControlException
 	{
 		super(Acteur.typeConsommateur, observateur, DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
 
 		this.tampon = tampon;
+
+		observateur.newConsommateur(this);
 
 		Afficheur.printNewConsumer(this);
 	}
@@ -29,11 +31,8 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 		{
 			try
 			{
-				// on récupère un message
 				Message message = tampon.get(this);
 
-				// si c'est le message de fin, on s'arrête
-				// double vérification du message au cas où (c'est inutile)
 				if(message == MESSAGE_END || message instanceof MessageEnd)
 				{
 					break;
@@ -41,12 +40,12 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 
 				int time = ALEATOIRE.next();
 
-				// on s'endort pour simuler un traitement
 				Thread.sleep(time);
+
+				observateur.consommationMessage(this, message, time);
 
 				Afficheur.printConsumption(this, message, time);
 
-				// on passe au message suivant
 				nombreMessages++;
 			}
 			catch(Exception e)
@@ -57,7 +56,6 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 
 		Afficheur.printEndConsumer(this);
 
-		// à la fin, on décrémente les consommateurs restants
 		tampon.decConsumers();
 	}
 

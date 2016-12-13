@@ -3,7 +3,7 @@ package jus.poc.prodcons.v4;
 import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 
 import jus.poc.prodcons.*;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 import jus.poc.prodcons.v2.Semaphore;
 import jus.poc.prodcons.message.MessageTTL;
 
@@ -39,7 +39,7 @@ public class ProdConsV4 implements Tampon
 		messages++;
 		nextWrite = next(nextWrite);
 
-		Printer.printPut(producteur, message);
+		Afficheur.printPut(producteur, message);
 
 		mutexIn.release();
 		notEmpty.release();
@@ -88,7 +88,7 @@ public class ProdConsV4 implements Tampon
 				wakeupC = true;
 			}
 
-			Printer.printGet(consommateur, ttl);
+			Afficheur.printGet(consommateur, ttl);
 
 			message = ttl;
 		}

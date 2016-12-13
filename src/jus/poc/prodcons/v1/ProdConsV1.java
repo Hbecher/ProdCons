@@ -6,7 +6,7 @@ import jus.poc.prodcons.Message;
 import jus.poc.prodcons.Tampon;
 import jus.poc.prodcons._Consommateur;
 import jus.poc.prodcons._Producteur;
-import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.print.Afficheur;
 
 public class ProdConsV1 implements Tampon
 {
@@ -39,7 +39,7 @@ public class ProdConsV1 implements Tampon
 		messages++;
 		nextWrite = next(nextWrite); // incrémentation du pointeur d'écriture
 
-		Printer.printPut(producteur, message);
+		Afficheur.printPut(producteur, message);
 
 		notifyAll(); // on notifie tout le monde que le buffer a été mis à jour
 	}
@@ -67,7 +67,7 @@ public class ProdConsV1 implements Tampon
 		messages--;
 		nextRead = next(nextRead); // on incrémente le pointeur de lecture
 
-		Printer.printGet(consommateur, message);
+		Afficheur.printGet(consommateur, message);
 
 		notifyAll(); // on notifie tout le monde que le buffer a été mis à jour
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="nbProd">10</entry>
-    <entry key="nbCons">5</entry>
-    <entry key="nbBuffer">3</entry>
+    <entry key="nbProd">5</entry>
+    <entry key="nbCons">3</entry>
+    <entry key="nbBuffer">2</entry>
     <entry key="tempsMoyenProduction">10</entry>
     <entry key="deviationTempsMoyenProduction">5</entry>
     <entry key="tempsMoyenConsommation">15</entry>

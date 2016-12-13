@@ -1,4 +1,4 @@
-package jus.poc.prodcons.v2;
+package jus.poc.prodcons.v6;
 
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
@@ -6,17 +6,19 @@ import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageX;
 import jus.poc.prodcons.print.Afficheur;
 
-public class ProducteurV2 extends Acteur implements _Producteur
+public class ProducteurV6 extends Acteur implements _Producteur
 {
 	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
-	private final ProdConsV2 tampon;
+	private final ProdConsV6 tampon;
 	private int nombreMessages = Aleatoire.valeur(DEFAULT_CONFIG.getProdMessagesMean(), DEFAULT_CONFIG.getProdMessagesDev());
 
-	public ProducteurV2(Observateur observateur, ProdConsV2 tampon) throws ControlException
+	public ProducteurV6(Observateur observateur, ProdConsV6 tampon) throws ControlException
 	{
 		super(Acteur.typeProducteur, observateur, DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 
 		this.tampon = tampon;
+
+		observateur.newProducteur(this);
 
 		Afficheur.printNewProducer(this);
 	}
@@ -35,6 +37,8 @@ public class ProducteurV2 extends Acteur implements _Producteur
 				Thread.sleep(time);
 
 				Message message = new MessageX(this, id, Long.toString(System.currentTimeMillis()));
+
+				observateur.productionMessage(this, message, time);
 
 				Afficheur.printProduction(this, message, time);
 
