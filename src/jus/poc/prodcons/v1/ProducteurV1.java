@@ -4,6 +4,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageX;
+import jus.poc.prodcons.print.Printer;
 
 public class ProducteurV1 extends Acteur implements _Producteur
 {
@@ -16,12 +17,14 @@ public class ProducteurV1 extends Acteur implements _Producteur
 		super(Acteur.typeProducteur, observateur, DEFAULT_CONFIG.getProdTimeMean(), DEFAULT_CONFIG.getProdTimeDev());
 
 		this.tampon = tampon;
+
+		Printer.printNewProducer(this);
 	}
 
 	@Override
 	public void run()
 	{
-		int id = 1;
+		int id = 1; // numéro du message
 
 		while(nombreMessages > 0)
 		{
@@ -29,14 +32,17 @@ public class ProducteurV1 extends Acteur implements _Producteur
 			{
 				int time = ALEATOIRE.next();
 
+				// on s'endort pour simuler une création de message
 				Thread.sleep(time);
 
-				Message message = new MessageX(this, id);
+				Message message = new MessageX(this, id, Long.toString(System.currentTimeMillis()));
 
+				Printer.printProduction(this, message, time);
+
+				// on met le message dans le buffer
 				tampon.put(this, message);
 
-				System.out.println(identification() + " -> " + message);
-
+				// on passe au message suivant
 				nombreMessages--;
 				id++;
 			}
@@ -46,8 +52,9 @@ public class ProducteurV1 extends Acteur implements _Producteur
 			}
 		}
 
-		System.out.println("Producteur n°" + identification() + " terminé");
+		Printer.printEndProducer(this);
 
+		// à la fin, on décrémente les producteurs restants
 		tampon.decProducers();
 	}
 

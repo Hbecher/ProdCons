@@ -5,6 +5,7 @@ import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
 import jus.poc.prodcons.message.MessageEnd;
+import jus.poc.prodcons.print.Printer;
 
 public class ConsommateurV1 extends Acteur implements _Consommateur
 {
@@ -17,6 +18,8 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 		super(Acteur.typeConsommateur, observateur, DEFAULT_CONFIG.getConsTimeMean(), DEFAULT_CONFIG.getConsTimeDev());
 
 		this.tampon = tampon;
+
+		Printer.printNewConsumer(this);
 	}
 
 	@Override
@@ -26,8 +29,11 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 		{
 			try
 			{
+				// on récupère un message
 				Message message = tampon.get(this);
 
+				// si c'est le message de fin, on s'arrête
+				// double vérification du message au cas où (c'est inutile)
 				if(message == MESSAGE_END || message instanceof MessageEnd)
 				{
 					break;
@@ -35,10 +41,12 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 
 				int time = ALEATOIRE.next();
 
+				// on s'endort pour simuler un traitement
 				Thread.sleep(time);
 
-				System.out.println(identification() + " <- " + message);
+				Printer.printConsumption(this, message, time);
 
+				// on passe au message suivant
 				nombreMessages++;
 			}
 			catch(Exception e)
@@ -47,8 +55,9 @@ public class ConsommateurV1 extends Acteur implements _Consommateur
 			}
 		}
 
-		System.out.println("Consommateur n°" + identification() + " terminé");
+		Printer.printEndConsumer(this);
 
+		// à la fin, on décrémente les consommateurs restants
 		tampon.decConsumers();
 	}
 

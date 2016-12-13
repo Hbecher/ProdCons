@@ -3,6 +3,15 @@ package jus.poc.prodcons.message;
 import jus.poc.prodcons.Message;
 import jus.poc.prodcons._Producteur;
 
+/**
+ * C'est le message de base.<br />
+ * Il contient :
+ * <ul>
+ * <li>le producteur qui l'a créé</li>
+ * <li>un identifiant propre au producteur (son numéro de production)</li>
+ * <li>une chaîne de caractères quelconque</li>
+ * </ul>
+ */
 public class MessageX implements Message
 {
 	private final _Producteur producteur;
@@ -39,6 +48,6 @@ public class MessageX implements Message
 	@Override
 	public String toString()
 	{
-		return String.format("%d-%d: %s", producteur.identification(), id, message == null ? "<empty>" : message);
+		return String.format("MessageX{pid=%d, id=%d, msg=%s}", producteur.identification(), id, message == null ? "<empty>" : message);
 	}
 }

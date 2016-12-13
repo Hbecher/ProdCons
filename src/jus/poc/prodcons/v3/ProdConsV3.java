@@ -3,7 +3,8 @@ package jus.poc.prodcons.v3;
 import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 
 import jus.poc.prodcons.*;
-import jus.poc.prodcons.common.Semaphore;
+import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.v2.Semaphore;
 
 public class ProdConsV3 implements Tampon
 {
@@ -37,6 +38,8 @@ public class ProdConsV3 implements Tampon
 		messages++;
 		nextWrite = next(nextWrite);
 
+		Printer.printPut(producteur, message);
+
 		mutexIn.release();
 		notEmpty.release();
 	}
@@ -62,6 +65,8 @@ public class ProdConsV3 implements Tampon
 			buffer[nextRead] = null;
 			messages--;
 			nextRead = next(nextRead);
+
+			Printer.printGet(consommateur, message);
 		}
 
 		mutexOut.release();

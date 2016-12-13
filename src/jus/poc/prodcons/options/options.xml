@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="nbProd">30</entry>
-    <entry key="nbCons">100</entry>
-    <entry key="nbBuffer">1</entry>
-    <entry key="tempsMoyenProduction">100</entry>
-    <entry key="deviationTempsMoyenProduction">50</entry>
-    <entry key="tempsMoyenConsommation">1500</entry>
-    <entry key="deviationTempsMoyenConsommation">300</entry>
+    <entry key="nbProd">10</entry>
+    <entry key="nbCons">5</entry>
+    <entry key="nbBuffer">3</entry>
+    <entry key="tempsMoyenProduction">10</entry>
+    <entry key="deviationTempsMoyenProduction">5</entry>
+    <entry key="tempsMoyenConsommation">15</entry>
+    <entry key="deviationTempsMoyenConsommation">3</entry>
     <entry key="nombreMoyenDeProduction">5</entry>
     <entry key="deviationNombreMoyenDeProduction">2</entry>
     <entry key="nombreMoyenNbExemplaire">5</entry>

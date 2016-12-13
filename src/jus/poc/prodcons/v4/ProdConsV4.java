@@ -3,7 +3,8 @@ package jus.poc.prodcons.v4;
 import static jus.poc.prodcons.message.MessageEnd.MESSAGE_END;
 
 import jus.poc.prodcons.*;
-import jus.poc.prodcons.common.Semaphore;
+import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.v2.Semaphore;
 import jus.poc.prodcons.message.MessageTTL;
 
 public class ProdConsV4 implements Tampon
@@ -38,6 +39,8 @@ public class ProdConsV4 implements Tampon
 		messages++;
 		nextWrite = next(nextWrite);
 
+		Printer.printPut(producteur, message);
+
 		mutexIn.release();
 		notEmpty.release();
 	}
@@ -48,6 +51,7 @@ public class ProdConsV4 implements Tampon
 		notEmpty.acquire();
 		mutexOut.acquire();
 
+		// ces booléens indiquent s'il faut réveiller un consommateur ou un producteur respectivement
 		boolean wakeupC = false, wakeupP = false;
 		Message message;
 
@@ -57,26 +61,34 @@ public class ProdConsV4 implements Tampon
 		}
 		else
 		{
+			// maintenant, on lit des MessageTTL
 			MessageTTL ttl = (MessageTTL) buffer[nextRead];
 
 			observateur.retraitMessage(consommateur, ttl);
 
-			ttl.dec();
+			ttl.dec(); // on retire un exemplaire
 
 			if(ttl.isLast())
 			{
+				// si c'était le dernier
+
 				buffer[nextRead] = null;
 				messages--;
 				nextRead = next(nextRead);
 
-				ttl.wakeup();
+				// on réveille le producteur en attente
+				ttl.getSender().wakeup();
 
+				// on réveille ensuite un producteur
 				wakeupP = true;
 			}
 			else
 			{
+				// sinon on réveille un consommateur
 				wakeupC = true;
 			}
+
+			Printer.printGet(consommateur, ttl);
 
 			message = ttl;
 		}
@@ -90,6 +102,7 @@ public class ProdConsV4 implements Tampon
 
 		if(wakeupP)
 		{
+			// attention : un producteur ne doit être réveillé que si un message a été complètement retiré !
 			notFull.release();
 		}
 

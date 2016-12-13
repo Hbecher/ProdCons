@@ -2,9 +2,16 @@ package jus.poc.prodcons.options;
 
 import java.util.Properties;
 
+/**
+ * Cette classe contient les options pouvant être lues depuis le fichiers options.xml.<br />
+ * Une configuration par défaut (celle présente dans le paquetage {@code jus.proc.prodcons.options}) est fournie : {@link Config#DEFAULT_CONFIG}.
+ */
 public class Config
 {
 	private static final String DEFAULT_XML_FILE = "/jus/poc/prodcons/options/options.xml";
+	/**
+	 * Configuration par défaut
+	 */
 	public static final Config DEFAULT_CONFIG = new Config(DEFAULT_XML_FILE)
 	{
 		private boolean isInitialized = false;
@@ -19,6 +26,8 @@ public class Config
 			if(isInitialized)
 			{
 				System.err.println("Default config cannot be re-initialized!");
+
+				return;
 			}
 
 			super.init();

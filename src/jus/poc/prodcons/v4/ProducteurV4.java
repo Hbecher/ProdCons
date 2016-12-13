@@ -3,8 +3,9 @@ package jus.poc.prodcons.v4;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.*;
-import jus.poc.prodcons.common.Semaphore;
 import jus.poc.prodcons.message.MessageTTL;
+import jus.poc.prodcons.print.Printer;
+import jus.poc.prodcons.v2.Semaphore;
 
 public class ProducteurV4 extends Acteur implements _Producteur
 {
@@ -20,6 +21,8 @@ public class ProducteurV4 extends Acteur implements _Producteur
 		this.tampon = tampon;
 
 		observateur.newProducteur(this);
+
+		Printer.printNewProducer(this);
 	}
 
 	@Override
@@ -38,10 +41,11 @@ public class ProducteurV4 extends Acteur implements _Producteur
 				MessageTTL message = new MessageTTL(this, id, Long.toString(System.currentTimeMillis()));
 
 				observateur.productionMessage(this, message, time);
+
+				Printer.printProduction(this, message, time);
+
 				tampon.put(this, message);
-
-				System.out.println(identification() + " -> " + message);
-
+				// après avoir publié le message, on attend qu'il soit intégralement consommé
 				wait.acquire();
 
 				nombreMessages--;
@@ -53,7 +57,7 @@ public class ProducteurV4 extends Acteur implements _Producteur
 			}
 		}
 
-		System.out.println("Producteur n°" + identification() + " terminé");
+		Printer.printEndProducer(this);
 
 		tampon.decProducers();
 	}
@@ -64,6 +68,9 @@ public class ProducteurV4 extends Acteur implements _Producteur
 		return nombreMessages;
 	}
 
+	/**
+	 * Réveille le producteur en attente, typiquement lorsque tous les exemplaires du MessageTTL qu'il a publié ont été consommés.
+	 */
 	public void wakeup()
 	{
 		wait.release();
