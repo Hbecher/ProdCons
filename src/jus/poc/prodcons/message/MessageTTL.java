@@ -3,13 +3,11 @@ package jus.poc.prodcons.message;
 import static jus.poc.prodcons.options.Config.DEFAULT_CONFIG;
 
 import jus.poc.prodcons.Aleatoire;
-import jus.poc.prodcons.common.Semaphore;
 import jus.poc.prodcons.v4.ProducteurV4;
 
 public class MessageTTL extends MessageX
 {
 	private static final Aleatoire ALEATOIRE = new Aleatoire(DEFAULT_CONFIG.getConsMessagesMean(), DEFAULT_CONFIG.getConsMessagesDev());
-	private final Semaphore s = new Semaphore(0);
 	private final int ttl;
 	private int c;
 
@@ -60,6 +58,6 @@ public class MessageTTL extends MessageX
 	@Override
 	public String toString()
 	{
-		return String.format("%d-%d-%d: %s", producteur.identification(), id, ttl, message == null ? "<empty>" : message);
+		return String.format("%d-%d-%d: %s", getSender().identification(), getID(), ttl, getMessage() == null ? "<empty>" : getMessage());
 	}
 }
